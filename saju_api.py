@@ -146,7 +146,10 @@ def calculate_month_pillar(birth_datetime, year_ganji, db):
 
     # 3. 월건표를 이용해 시작 천간(인월 천간)을 찾습니다.
     year_gan = year_ganji[0] 
-    start_gan = MONTH_PILLAR_START_GAN[year_gan] 
+start_gan = MONTH_PILLAR_START_GAN.get(year_gan) # .get()을 사용하여 안전하게 접근합니다.
+if start_gan is None:
+    # 키를 못 찾으면 임시로 '甲'을 사용하거나 오류 처리
+    return "월주 계산 오류: 년주 천간을 찾을 수 없습니다."
 
     # 4. 월 천간/지지를 계산합니다.
     start_gan_index = GANS.index(start_gan)
