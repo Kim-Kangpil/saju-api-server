@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, timedelta
-
+import os
 # [여기에 추가] Flask에 필요한 모듈을 불러옵니다.
 from flask import Flask, request, jsonify 
 from flask_cors import CORS
@@ -56,9 +56,16 @@ KST_DST_PERIODS = [
 ]
 
 def load_solar_terms_db(filename='solar_terms_db.json'):
-    """절입시 JSON 파일을 불러와 메모리에 로드하는 함수"""
+    """
+    절입시 JSON 파일을 불러와 메모리에 로드하는 함수 (Vercel 호환 경로 설정)
+    """
+    # 1. Vercel 환경에서 파일 경로를 안전하게 설정합니다.
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, filename)
+
     try:
-        with open(filename, 'r', encoding='utf-8') as f:
+        # 2. 새로운 파일 경로(file_path)로 파일을 엽니다.
+        with open(file_path, 'r', encoding='utf-8') as f:
             raw_db = json.load(f)
             solar_terms_db = {}
             for dt_str, term_name in raw_db.items():
@@ -67,10 +74,10 @@ def load_solar_terms_db(filename='solar_terms_db.json'):
             print(f"✅ 절입시 DB 로딩 완료. 총 {len(solar_terms_db)}개 데이터.")
             return solar_terms_db
     except FileNotFoundError:
-        print(f"🚨 오류: '{filename}' 파일을 찾을 수 없습니다.")
+        print(f"❌ 오류: '{file_path}' 파일을 찾을 수 없습니다. 경로 확인 필수.")
         return None
     except json.JSONDecodeError as e:
-        print(f"🚨 오류: '{filename}' 파일의 JSON 형식이 잘못되었습니다.")
+        print(f"🚨 오류: '{filename}' 파일의 JSON 형식이 잘못되었습니다. {e}")
         return None
 
 # ==============================================================
